@@ -1,0 +1,44 @@
+#!/bin/bash
+
+touch /home/conf/sites_loc.conf
+echo "<VirtualHost *:80>
+    ServerName wegetin.com
+    ServerAlias www.wegetin.com
+    DocumentRoot /nfs/domains/wegetin.com/
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName swarmmobileapp.com
+    ServerAlias www.swarmmobileapp.com
+    DocumentRoot /nfs/domains/swarmmobileapp.com/
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName sparkticketapp.com
+    ServerAlias www.sparkticketapp.com
+    DocumentRoot /nfs/domains/sparkticketapp.com/
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName hmt.fm
+    ServerAlias www.hmt.fm
+    DocumentRoot /nfs/domains/hmt.fm/
+</VirtualHost>
+
+" > /home/conf/sites_loc.conf
+
+IFS=' ' read -a array <<< "$(cat /vagrant/conf/sites.conf | grep 'ServerAlias dynamo-ssd1')"
+
+for site in "${array[@]}"
+do
+  if [ "$site" != "ServerAlias" ]
+  then
+    loc=${site/.com/.loc}
+    loc=${loc/.net/.loc}
+
+    echo "<VirtualHost *:80>" >> /home/conf/sites_loc.conf
+    echo "    ServerName $loc" >> /home/conf/sites_loc.conf
+    echo "    DocumentRoot /nfs/domains/dynamo/" >> /home/conf/sites_loc.conf
+    echo "</VirtualHost>" >> /home/conf/sites_loc.conf
+  fi
+done

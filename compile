@@ -1,0 +1,79 @@
+#!/bin/bash
+echo "----> Lets do this!!!!"
+cd /home/
+
+#yum install php5
+#yum install php
+echo "----> Installing a bunch of web shit from webtatic"
+rpm -Uvh http://mirror.webtatic.com/yum/el6/latest.rpm
+
+echo "----> Installing PHP"
+#yum install php
+yum -y install php54w
+echo "----> Installing all the php extenstions you will need"
+#php -v
+#yum -y install php-mysql
+yum -y install php54w-mysql
+yum -y install php54w-json
+yum -y install php54w-*
+yum -y install php54w-gd
+#php -v
+yum -y install php54w-pecl-apc
+
+cd /
+mkdir nfs
+cd nfs
+mkdir domains
+
+echo "-----> Setting up Symlinks for your Vagrant config"
+ln -s /vagrant/conf /home/conf
+ln -s /vagrant/cronjobs /home/cronjobs
+ln -s /vagrant/domains /home/domains
+ln -s /vagrant/domains /nfs/domains
+ln -s /vagrant/domains/wegetin.com/ /nfs/domains/wegetin.com
+ln -s /vagrant/domains/swarmmobileapp.com/ /nfs/domains/swarmmobileapp.com
+ln -s /vagrant/domains/sparkticketapp.com/ /nfs/domains/sparkticketapp.com
+ln -s /vagrant/domains/hmt.fm/ /nfs/domains/hmt.fm
+ln -s /vagrant/domains/dynamo/ /nfs/domains/dynamo
+
+echo "----> Setting up Cache and permissions"
+
+cd /home/domains/dynamo
+mkdir cache/
+cd cache/
+mkdir requests
+mkdir output
+chmod 777 *
+
+echo "----> Copy over php.ini and http.conf"
+mv /etc/php.ini /etc/php_orig.ini_o
+mv /root/php.ini /etc/
+
+mv /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd_orig.conf_o
+mv /root/httpd.conf /etc/httpd/conf/httpd.conf
+
+echo "----> Starting apache again"
+/etc/rc.d/init.d/httpd start
+
+echo "----> Restarting apache"
+/etc/rc.d/init.d/httpd restart
+
+echo "creating boot file at /root/boot.sh"
+cd /root
+
+
+cat >>boot.sh <<EOF
+#!/usr/bin/env bash
+
+echo "rebuilding sites conf"
+./root/build_sites
+
+echo "Stopping iptables"
+/etc/init.d/iptables stop
+
+echo "Booting apache"
+/etc/init.d/httpd start
+EOF
+chmod +x boot.sh
+
+echo "----> All done <----"
