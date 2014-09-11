@@ -29,12 +29,14 @@ echo "<VirtualHost *:80>
 
 IFS=' ' read -a array <<< "$(cat /vagrant/conf/sites.conf | grep 'ServerAlias dynamo-ssd1')"
 
+local_etc="10.0.0.3     "
 for site in "${array[@]}"
 do
   if [ "$site" != "ServerAlias" ]
   then
     loc=${site/.com/.loc}
     loc=${loc/.net/.loc}
+    local_etc="$local_etc $loc"
 
     echo "<VirtualHost *:80>" >> /home/conf/sites_loc.conf
     echo "    ServerName $loc" >> /home/conf/sites_loc.conf
@@ -42,3 +44,6 @@ do
     echo "</VirtualHost>" >> /home/conf/sites_loc.conf
   fi
 done
+
+echo "====> Put this in your comps /etc/hosts file:"
+echo $local_etc
