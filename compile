@@ -72,7 +72,7 @@ echo "Stopping iptables"
 /etc/init.d/iptables stop
 
 echo "Booting apache"
-/etc/init.d/httpd start
+/etc/init.d/httpd restart
 EOF
 chmod +x boot.sh
 
