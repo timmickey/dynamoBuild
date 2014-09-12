@@ -47,10 +47,10 @@ chmod 777 *
 
 echo "----> Copy over php.ini and http.conf"
 mv /etc/php.ini /etc/php_orig.ini_o
-mv /root/php.ini /etc/
+mv /root/dynamoBuild/php.ini /etc/
 
 mv /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd_orig.conf_o
-mv /root/httpd.conf /etc/httpd/conf/httpd.conf
+mv /root/dynamoBuild/httpd.conf /etc/httpd/conf/httpd.conf
 
 echo "----> Starting apache again"
 /etc/rc.d/init.d/httpd start
@@ -66,7 +66,7 @@ cat >>boot.sh <<EOF
 #!/usr/bin/env bash
 
 echo "rebuilding sites conf"
-./root/build_sites
+/root/dynamoBuild/build_sites
 
 echo "Stopping iptables"
 /etc/init.d/iptables stop
